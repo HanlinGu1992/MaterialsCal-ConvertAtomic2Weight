@@ -1,4 +1,4 @@
-# MaterialsCal-ConvertAtomic2Weight
+# Conversion Between Atomic Percent and Weight Percent (at.%  $\leftrightarrow$ wt.%)
 
 This code provides a solution for the conversion between atomic percentage and weight percentage.
 
@@ -7,6 +7,7 @@ This code provides a solution for the conversion between atomic percentage and w
 ### Step 1. Generate Atomic Weight JSON File
 
 **1. Install the `mendeleev` package**
+
 Execute the following command in the terminal:
 
 ```python
