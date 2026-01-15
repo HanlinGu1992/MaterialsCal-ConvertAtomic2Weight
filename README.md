@@ -38,3 +38,7 @@ Execute the following command in the terminal:
 ```python
 pyinstaller --onefile --windowed --add-data "01_element_atomic-masses.json;." 02_GUI.py
 ```
+
+### Executable Program
+
+Find the Executable Program in the `dist` folder with name `02_Gui.exe`. Double click and enjoy the code.
