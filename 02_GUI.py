@@ -11,7 +11,11 @@ from tkinter.font import Font
 # ==========================================
 
 def resource_path(relative_path):
-    """Get absolute path to resource, works for dev and for PyInstaller"""
+    """
+    Get the absolute path to a resource.
+    This function handles paths for both the development environment 
+    and the PyInstaller bundled executable.
+    """
     try:
         # PyInstaller creates a temp folder and stores path in _MEIPASS
         base_path = sys._MEIPASS
@@ -22,6 +26,10 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 def get_element_atomic_masses():
+    """
+    Load element atomic masses from a JSON file.
+    Includes a fallback dictionary if the file is missing.
+    """
     # Use resource_path to locate the JSON file
     filename = resource_path('01_element_atomic-masses.json')
     
@@ -31,7 +39,14 @@ def get_element_atomic_masses():
     if not os.path.exists(filename):
         # Fallback dictionary if JSON is not found (e.g., if forgotten during packaging)
         # Data covers H to Zn
-        return {"H": 1.008, "He": 4.0026, "Li": 6.94, "Be": 9.0122, "B": 10.81, "C": 12.011, "N": 14.007, "O": 15.999, "F": 18.998, "Ne": 20.180, "Na": 22.990, "Mg": 24.305, "Al": 26.982, "Si": 28.085, "P": 30.974, "S": 32.06, "Cl": 35.45, "Ar": 39.948, "K": 39.098, "Ca": 40.078, "Sc": 44.956, "Ti": 47.867, "V": 50.942, "Cr": 51.996, "Mn": 54.938, "Fe": 55.845, "Co": 58.933, "Ni": 58.693, "Cu": 63.546, "Zn": 65.38}
+        return {
+            "H": 1.008, "He": 4.0026, "Li": 6.94, "Be": 9.0122, "B": 10.81, 
+            "C": 12.011, "N": 14.007, "O": 15.999, "F": 18.998, "Ne": 20.180, 
+            "Na": 22.990, "Mg": 24.305, "Al": 26.982, "Si": 28.085, "P": 30.974, 
+            "S": 32.06, "Cl": 35.45, "Ar": 39.948, "K": 39.098, "Ca": 40.078, 
+            "Sc": 44.956, "Ti": 47.867, "V": 50.942, "Cr": 51.996, "Mn": 54.938, 
+            "Fe": 55.845, "Co": 58.933, "Ni": 58.693, "Cu": 63.546, "Zn": 65.38
+        }
     
     try:
         with open(filename, 'r', encoding='utf-8') as f:
@@ -43,7 +58,9 @@ def get_element_atomic_masses():
 ELEMENT_MOLAR_MASS = get_element_atomic_masses()
 
 def check_input_composition(comp_dict, mode='wt'):
-    """Ensure the input composition sums to 100% (with a small tolerance)"""
+    """
+    Ensure the input composition sums to 100% (with a small tolerance).
+    """
     total = sum(comp_dict.values())
     if not (abs(total-100) <= 0.01):
         raise ValueError(f"Sum is {total:.4f}, not equal to 100%. Please check your input.")
@@ -75,7 +92,10 @@ def at_to_wt(at_dict):
     return wt_dict
 
 def parse_composition_input(user_str):
-    """Parse input string with flexible error handling"""
+    """
+    Parse the input string with flexible error handling.
+    Accepts formats like 'Fe:50, C:50' or direct dicts.
+    """
     try:
         clean_str = user_str.strip()
         # Allow Python dict format
@@ -105,9 +125,8 @@ class CompositionApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Material Composition Converter")
-        self.root.geometry("650x600") # Increased height slightly to accommodate larger output
         
-        # 1. Apply Modern Theme
+        # 1. Apply Modern Theme (Must be done before centering if styles affect size)
         self.setup_styles()
         
         # Define fonts
@@ -135,10 +154,10 @@ class CompositionApp:
         radio_frame.pack(fill=tk.X)
         
         # Radio buttons for Wt% -> At% and At% -> Wt%
-        rb1 = ttk.Radiobutton(radio_frame, text="Wt% -> At%", variable=self.mode_var, value="1")
+        rb1 = ttk.Radiobutton(radio_frame, text="Wt.% -> At.%", variable=self.mode_var, value="1")
         rb1.pack(side=tk.LEFT, padx=20)
         
-        rb2 = ttk.Radiobutton(radio_frame, text="At% -> Wt%", variable=self.mode_var, value="2")
+        rb2 = ttk.Radiobutton(radio_frame, text="At.% -> Wt.%", variable=self.mode_var, value="2")
         rb2.pack(side=tk.LEFT, padx=20)
 
         # --- Input Area (Reduced size) ---
@@ -191,10 +210,42 @@ class CompositionApp:
         # Link scrollbar to text
         scrollbar.config(command=self.result_text.yview)
 
+        # --- Window Positioning ---
+        # Set initial geometry, then apply the centering fix
+        self.root.geometry("650x600") 
+        self.center_window()
+
+    def center_window(self):
+        """
+        Centers the window on the screen with a bottom safety margin 
+        to avoid obscuration by the taskbar.
+        """
+        self.root.update_idletasks()
+        
+        # Get window width and height
+        width = self.root.winfo_width()
+        height = self.root.winfo_height()
+        
+        # Get screen width and height
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        
+        # Calculate centered x coordinate
+        x = (screen_width / 2) - (width / 2)
+        
+        # Calculate centered y coordinate, offset upwards by 50px
+        # to avoid the bottom taskbar.
+        # Adjust this number (e.g., 40 or 60) if needed.
+        y = (screen_height / 2) - (height / 2) - 50
+        
+        # Set window position
+        self.root.geometry(f'{width}x{height}+{int(x)}+{int(y)}')
+
     def setup_styles(self):
         """Configure modern styles using ttk.Style"""
         style = ttk.Style()
-        # Use 'clam' as a cross-platform base for custom coloring (works better than default on Windows/Mac)
+        # Use 'clam' as a cross-platform base for custom coloring 
+        # (works better than default on Windows/Mac)
         try:
             style.theme_use('clam') 
         except:
@@ -250,12 +301,12 @@ class CompositionApp:
             # Choose conversion direction
             if mode == "1":
                 result_dict = wt_to_at(comp_dict)
-                origin_label = "Wt%"
-                result_label = "At%"
+                origin_label = "Wt.%"
+                result_label = "At.%"
             else:
                 result_dict = at_to_wt(comp_dict)
-                origin_label = "At%"
-                result_label = "Wt%"
+                origin_label = "At.%"
+                result_label = "Wt.%"
 
             # Format output
             output_lines = []
