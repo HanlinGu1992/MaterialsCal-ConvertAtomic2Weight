@@ -4,7 +4,8 @@ This code provides a solution for the conversion between atomic percentage and w
 
 ## Download
 
-Windows Version: Direct download from the Releases. [Material-Composition-Converter-v1.0.exe](<https://github.com/HanlinGu1992/MaterialsCal-ConvertAtomic2Weight/releases/download/Material-Science/Material-Composition-Converter-v1.0.exe>)
+Windows Version: Direct download from the Releases. 
+[Material-Composition-Converter-v1.0.exe](<https://github.com/HanlinGu1992/MaterialsCal-ConvertAtomic2Weight/releases/download/At2Wt/At2Wt_GUI_v1.0_20260119.exe>)
 
 ## Generation of the Executable Program
 
